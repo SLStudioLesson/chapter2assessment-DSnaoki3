@@ -1,7 +1,6 @@
 package ui;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,10 +39,10 @@ public class RecipeUI {
                     case "1":
                         // 設問1: 一覧表示機能
                         displayRecipes();
-
                         break;
                     case "2":
                         // 設問2: 新規登録機能
+                        addNewRecipe();
                         break;
                     case "3":
                         // 設問3: 検索機能
@@ -65,23 +64,33 @@ public class RecipeUI {
      * 設問1: 一覧表示機能
      * RecipeFileHandlerから読み込んだレシピデータを整形してコンソールに表示します。
      */
+    //1.readRecipes()でArrayListを受け取る用のArrayListを作成する
+    //2.読み込んだレシピデータが空の場合という条件分岐を行う
+    //3.readRecipes()でArrayListを受け取ったArrayList要素(0）を","で分割し、配列に入れる
+    //4.配列を再度ArrayListに入れる（利便性のため）
+    //5."Recipe Name:" + lineList.get(0)と表示させる
+    //6.lineList.get(0)をremove
+    //7.残りの要素を表示
+    //8.3からをArrayListの大きさまで繰り返す
     private void displayRecipes() {
         ArrayList<String> fileslist = new ArrayList<>(fileHandler.readRecipes());
         System.out.println("Recipes:");
         
-        if(fileslist != null){
-            System.out.println("-----------------------------------");
-            
+        if(!(fileslist.isEmpty())){
             for(String s: fileslist){
+                System.out.println("-----------------------------------");
                 String[] line = s.split(",");
                 ArrayList<String> lineList = new ArrayList<>(Arrays.asList(line));
                 System.out.println("Recipe Name:" + lineList.get(0));
                 lineList.remove(0);
                 System.out.print("Main Ingredients:");
-                for(String s1: lineList){
-                    System.out.print(s1 + ", ");
+                for(int i = 0; i < lineList.size(); i++){
+                    if(i == lineList.size() - 1){
+                        System.out.println(lineList.get(i));
+                    }else{
+                        System.out.print(lineList.get(i) + ", ");
+                    }
                 }
-                System.out.println();
             }
         }else{
             System.out.println("No recipes available.");
@@ -96,7 +105,15 @@ public class RecipeUI {
      *
      * @throws java.io.IOException 入出力が受け付けられない
      */
+    //1.BufferedReaderで"Enter recipe name:"と"Enter main ingredients (comma separated):"の入力を受け付ける
+    //2.入力した値を引数にしたfileHandler.addRecipe(recipeName, ingredients);を実行する
     private void addNewRecipe() throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.print("Enter recipe name:");
+        String recipeName = reader.readLine();
+        System.out.print("Enter main ingredients (comma separated):");
+        String ingredients = reader.readLine();
+        fileHandler.addRecipe(recipeName, ingredients);
     }
 
     /**
